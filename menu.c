@@ -73,25 +73,25 @@ int iniciaMenu(char** argv){
 	printf("4 - Compressão Com Perdas e Compressão Sem Perdas \n");
 	printf("\n\nDigite a opção desejada (1-4): ");
 	scanf("%c",&opcao);
-	
+	getchar();
 	
 	switch(opcao){
-		case 1:	{
+		case '1':	{
 			if (compressaoSemPerdas())
 				return EXIT_FAILURE;			
 			break;
 		}	 
-		case 2:	{
+		case '2':	{	
 			if (compressaoComPerdas())
-				return EXIT_FAILURE;		
+				return EXIT_FAILURE;	
 			break;
 		}	
-		case 3:	{
+		case '3':	{
 			if (compressaoSemPerdas())
 				return EXIT_FAILURE;			
 			break;
 		}	
-		case 4:	{
+		case '4':	{
 			if (compressaoSemPerdas())
 				return EXIT_FAILURE;		
 			break;
@@ -103,20 +103,22 @@ int iniciaMenu(char** argv){
 	printf("2 - Descompressão Com Perdas \n");
 	printf("3 - Sem Descompressão \n");
 	printf("\n\nDigite a opção desejada (1-3): ");
+	
 	scanf("%c",&opcao);
+	getchar();
 	
 	switch(opcao){
-		case 1:	{
+		case '1':	{
 			if (descompressaoSemPerdas())
 				return EXIT_FAILURE;			
 			break;
 		}	 
-		case 2:	{
+		case '2':	{
 			if (descompressaoComPerdas())
 				return EXIT_FAILURE;		
 			break;
 		}	
-		case 3:	{
+		case '3':	{
 			return EXIT_SUCCESS;		
 			break;
 		}	

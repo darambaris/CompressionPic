@@ -1,3 +1,11 @@
+/*
+ ============================================================================================================
+ Nome         : CompressaoComPerdas.c
+ Autores      : Jéssika Darambaris e Roberto Freitas
+ Descrição    : Arquivo responsável por implementar a técnica de descompressão
+ ============================================================================================================
+ */
+
 int descompressaoSemPerdas(){
-	return 0;
+	return EXIT_SUCCESS;
 }
