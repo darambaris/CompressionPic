@@ -21,12 +21,12 @@ Obs: Colocar imagem BMP na pasta imagens... \n\n"
 
 
 /* assinaturas */
-int parametrosEntrada(int, char**);
+int trataParametrosEntrada(int, char**);
 int iniciaMenu(char**);
 
 int main (int argc, char *argv[]){	
 	
-	if (parametrosEntrada(argc, argv)) {
+	if (trataParametrosEntrada(argc, argv)) {
 		return EXIT_FAILURE;
 	}
 
@@ -39,7 +39,7 @@ int main (int argc, char *argv[]){
 }
 
 /* trata os parâmetros de entrada, verificando se há alguma imagem .bmp */
-int parametrosEntrada(int argc, char** argv){
+int trataParametrosEntrada(int argc, char** argv){
 	
 	char *img = malloc(sizeof(argv[1]));	
 	strcpy(img,argv[1]);
@@ -106,7 +106,7 @@ int iniciaMenu(char** argv){
 	
 	scanf("%c",&opcao);
 	getchar();
-	
+
 	switch(opcao){
 		case '1':	{
 			if (descompressaoSemPerdas())
