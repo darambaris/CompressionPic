@@ -1,74 +1,98 @@
 #ifndef HUFFMAN_H
 #define HUFFMAN_H
 
-#define MAX_CODE_LENGTH 50
+// This constant can be avoided by explicitly calculating height of Huffman Tree
+#define MAX_TREE_HT 100
 
-#include "tree.h"
-#include "bitwriter.h"
-#include "bitreader.h"
 #include <stdlib.h>
 
 
-typedef struct{
-    unsigned int frequencies[256];
-    unsigned int bytes_count;  // count number of bytes to generate code, up to 256
+ 
+//Estrutura de dados dos nós da Árvore Binária (Huffman).
+struct NoHeap
+{
+    char val;  // Valor do pixel inserido na árvore
+    unsigned freq;  // Frequencia do pixel inserido
+    struct NoArvoreH *esqr, *dir; // Nós da esquerda e da direita da árvore
+};
+ 
+//Estrutura de dados da Árvore Binária (Huffman).
+struct Heap
+{
+    unsigned tamanho;    // Tamanho
+    unsigned capacidade;   // Capacidade da Árvore
+    struct NoArvoreH **array;  // Array de Nós de ArvoreH.
+};
+ 
 
-    unsigned char *codes[256]; // array of strings, each string is a binary code of the byte
-
-    Node *htree;
-
-    // uc : uncompressed
-    unsigned char **uc_data; // blocks of data to compress
-    unsigned int uc_blocks;
-    unsigned int *uc_sizes;
-
-} Huffman;
-
-/**
-    Initializes the Huffman data structure
+/*
+    Função que cria um novo nó na Heap.
+    - char val: valor da intensidade do pixel
+    - freq: frequencia do valor
 */
-void Huffman_init(Huffman *h);
+struct NoHeap* NovoNo (char val, unsigned freq)
 
-/**
-    Add a data block to the structure, all data blocks will be compressed.
+/*
+    Função que cria um Heap.
+    - unsigned capacidade: capacidade da árvore. 
 */
-void Huffman_add_data_block(Huffman *h, unsigned char *data,unsigned int size);
+struct Heap* CriarHeap(unsigned capacidade);
 
-
-/**
-    Count frequencies of bytes in data blocks
+/*
+    Função para trocar dois nós.
+    - NoArvoreH *a: Nó da árvore a. 
+    - NoArvoreH *b: Nó da árvore b. 
 */
-void Huffman_count_frequencies(Huffman *h);
+void TrocarNos(struct NoArvoreH** a, struct NoArvoreH** b);
 
-/**
-    Build Huffman Tree using frequencies of bytes
+/*
+    Função 
+    - struct ArvoreH* ArvoreH: Árvore de Huffman.
+    - int idx: index
 */
-void Huffman_build_tree(Huffman *h);
+void ArvoreMin(struct ArvoreH* ArvoreH, int idx);
 
-/**
-    Generate the Hufffman Codes for each byte
+/*
+    Função que verifica se a árvore possui tamanho um.
+    - struct ArvoreH* ArvoreH: ArvoreH possui tamanho um?
 */
-void Huffman_generate_codes(Huffman *h);
+int TamanhoUm(struct ArvoreH* ArvoreH);
 
-/**
-    Apply the 3 last functions above, so the process to compress is Init, Add Data Block, Apply, Compress Data to File.
+/*
+    Função que retira o nó de menor valor da Árvore.
+    - struct ArvoreH* ArvoreH: Árvore.
 */
-void Huffman_apply(Huffman *h);
+struct NoArvoreH* ValMin (struct ArvoreH* ArvoreH);
 
-/**
-    Will compress all the data using the generated Huffman codes.
+/* 
+    Função que insere um nó na Árvore.
+    - struct ArvoreH* ArvoreH:
+    - struct NoArvoreH* NoArvoreH:
 */
-void Huffman_compress_data_to_file(Huffman *h, char filename[]);
+void Insere(struct ArvoreH* ArvoreH, struct NoArvoreH* NoArvoreH);
 
-/**
-    Free the memory used by the structure
-*/
-void Huffman_free(Huffman *h);
+/*
+    Função Constroi uma Arvore Binária Huffman
+    - struct ArvoreH* ArvoreH: Arvore Binária. 
 
-/**
-    Uncompress a file compressed by this algorithm, will put one data block wich is the data uncompressed from file.
 */
-void Huffman_file_decompress(Huffman *h, char filename[]);
+void ConstroiArvore(struct ArvoreH* ArvoreH);
+
+/*
+    Função que gera o Codigo Huffman.
+    - char val[]: 
+    - int freq[]:
+    - int tamanho:
+*/
+void CodigoHuffman (char val[], int freq[], int tamanho);
+
+
+/*
+    Função que printa Array
+    - int array[]: array a ser printado
+    - int n: tamanho do array
+*/
+void printArray (int array[], int n);
 
 
 #endif // HUFFMAN_H
