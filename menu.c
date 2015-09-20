@@ -22,6 +22,7 @@ Obs: Colocar imagem BMP na pasta imagens... \n\n"
 
 /* assinaturas */
 int trataParametrosEntrada(int, char**);
+int abreArquivo(char**);
 int iniciaMenu(char**);
 
 int main (int argc, char *argv[]){	
@@ -29,6 +30,11 @@ int main (int argc, char *argv[]){
 	if (trataParametrosEntrada(argc, argv)) {
 		return EXIT_FAILURE;
 	}
+
+	/* inicia o menu */
+	if (abreArquivo(argv)) {
+		return EXIT_FAILURE;
+	}	
 
 	/* inicia o menu */
 	if (iniciaMenu(argv)) {
@@ -125,4 +131,22 @@ int iniciaMenu(char** argv){
 	}	
 }
 
+int abreArquivo(char** argv){
 	
+	char **path = malloc(sizeof(char *)*4);
+	path[0] = malloc (sizeof(argv[1])+15);
+
+	strcat(path[0],"imagens/");
+	strcat(path[0],argv[1]);
+	
+	FILE *arq = fopen(path[0],"r");
+	
+	if (arq == NULL){
+		printf("\nHouve um erro ao abrir o arquivo. \n");
+		return EXIT_FAILURE;
+	}
+
+	fclose(arq);
+
+	return EXIT_SUCCESS;
+}	
