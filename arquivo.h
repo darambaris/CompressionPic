@@ -1,7 +1,7 @@
 #ifndef ARQUIVO_H
 #define ARQUIVO_H
 	
-	typedef struct {
+typedef struct {
      short bfType;       /* Magic number for file */
 } BMPMAGICNUMBER;
 
