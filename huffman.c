@@ -9,39 +9,41 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#define MAX_TREE 100
+
+ //Altura máxima da árvore
+#define MAX_ARV 100
  
-//Estrutura de dados dos nós da Árvore Binária (Huffman).
-struct NoHeap
+//Nó da Árvore de Huffman
+struct NoArvoreH
 {
     char val;  // Valor do pixel inserido na árvore
     unsigned freq;  // Frequencia do pixel inserido
-    struct NoHeap *esqr, *dir; // Nós da esquerda e da direita da árvore
+    struct NoArvoreH *esqr, *dir; // Nós da esquerda e da direita da árvore
 };
  
-//Estrutura de dados da Árvore Binária (Huffman).
+//Coleção de Árvores de Huffman. Funcionará como fila de prioridade.
 struct Heap
 {
     unsigned tamanho;    // Tamanho
     unsigned capacidade;   // Capacidade da Árvore
-    struct NoHeap **array;  // Array de Nós de ArvoreH.
+    struct NoArvoreH **array;  // Array de Nós de ArvoreH.
 };
 
-// Cria um heap
+// Cria um Heap
 struct Heap* CriarHeap(unsigned capacidade)
 {
     struct Heap* Heap = (struct Heap*) malloc(sizeof(struct Heap));
     Heap->tamanho = 0; 
     Heap->capacidade = capacidade;
-    Heap->array = (struct NoHeap**)malloc(Heap->capacidade * sizeof(struct NoHeap*));
+    Heap->array = (struct NoArvoreH**)malloc(Heap->capacidade * sizeof(struct NoArvoreH*));
     return Heap;
 }
 
 
-//Cria um nó do Heap
-struct NoHeap* NovoNo (char val, unsigned freq)
+//Cria um nó da Árvore
+struct NoArvoreH* NovoNo (char val, unsigned freq)
 {
-    struct NoHeap* temp = (struct NoHeap*) malloc(sizeof(struct NoHeap));
+    struct NoArvoreH* temp = (struct NoArvoreH*) malloc(sizeof(struct NoArvoreH));
     temp->esqr = temp->dir = NULL;
     temp->val = val;
     temp->freq = freq;
@@ -50,14 +52,14 @@ struct NoHeap* NovoNo (char val, unsigned freq)
  
  
 // Função para trocar dois nós
-void TrocarNos(struct NoHeap** a, struct NoHeap** b)
+void TrocarNos(struct NoArvoreH** a, struct NoArvoreH** b)
 {
-    struct NoHeap* t = *a;
+    struct NoArvoreH* t = *a;
     *a = *b;
     *b = t;
 }
  
-
+//Arruma a árvore
 void HeapMin(struct Heap* Heap, int idx)
 {
     int menor = idx;
@@ -77,16 +79,16 @@ void HeapMin(struct Heap* Heap, int idx)
     }
 }
  
-//Verifica se a Árvore tem tamanho um
+//Verifica se o Heap tem tamanho um
 int TamanhoUm(struct Heap* Heap)
 {
     return (Heap->tamanho == 1);
 }
  
 // Tira o nó com o menor valor do heap
-struct NoHeap* ValMin (struct Heap* Heap)
+struct NoArvoreH* ValMin (struct Heap* Heap)
 {
-    struct NoHeap* temp = Heap->array[0];
+    struct NoArvoreH* temp = Heap->array[0];
     Heap->array[0] = Heap->array[Heap->tamanho - 1];
     --Heap->tamanho;
     HeapMin(Heap, 0);
@@ -94,17 +96,17 @@ struct NoHeap* ValMin (struct Heap* Heap)
 }
  
 // Função que insere um nó na Árvore.
-void Insere(struct Heap* Heap, struct NoHeap* NoHeap)
+void Insere(struct Heap* Heap, struct NoArvoreH* NoArvoreH)
 {
     ++Heap->tamanho;
     int i = Heap->tamanho - 1;
-    while (i && NoHeap->freq < Heap->array[(i - 1)/2]->freq)
+    while (i && NoArvoreH->freq < Heap->array[(i - 1)/2]->freq)
     {
         Heap->array[i] = Heap->array[(i - 1)/2];
         i = (i - 1)/2;
     }
 
-    Heap->array[i] = NoHeap;
+    Heap->array[i] = NoArvoreH;
 }
  
 //Constroi Heap
@@ -117,7 +119,7 @@ void ConstroiHeap(struct Heap* Heap)
 }
  
 //Função Verifica se nó é folha.
-int Folha (struct NoHeap* raiz)
+int Folha (struct NoArvoreH* raiz)
 {
     return !(raiz->esqr) && !(raiz->dir) ;
 }
@@ -134,38 +136,37 @@ struct Heap* CriareConstruirHeap (char val[], int freq[], int tamanho)
     return Heap;
 }
  
-// The main function that builds Huffman tree
-struct NoHeap* ConstroiArvoredeHuffman (char val[], int freq[], int tamanho)
+//Principal função para a criação da Arvore de Huffman
+struct NoArvoreH* ConstroiArvoredeHuffman (char val[], int freq[], int tamanho)
 {
-    struct NoHeap *esqr, *dir, *acima;
+    struct NoArvoreH *esqr, *dir, *acima;
  
-    // Step 1: Create a min heap of capacity equal to size.  Initially, there are
-    // modes equal to size.
+
+    //Passo 1: Criar um Heap.
     struct Heap* Heap = CriareConstruirHeap(val, freq, tamanho);
  
-    // Iterate while size of heap doesn't become 1
+    //Enquanto o Heap não tem apenas um elemento
     while (!TamanhoUm(Heap))
     {
-        // Step 2: Extract the two minimum freq items from min heap
+        // Passo 2: Pegar os valores com as duas menores frequencias no heap
         esqr = ValMin(Heap);
         dir = ValMin(Heap);
  
-        // Step 3:  Create a new internal node with frequency equal to the
-        // sum of the two nodes frequencies. Make the two extracted node as
-        // left and right children of this new node. Add this node to the min heap
-        // '$' is a special value for internal nodes, not used
+
+        // Passo 3: Cria um novo nó com frequencia igual a soma da frequencia dos dois nós achados anteriormente.
         acima = NovoNo('$', esqr->freq + dir->freq);
         acima->esqr = esqr;
         acima->dir = dir;
+        //  Passo 4: Adiciona o novo nó criado ao Heap.
         Insere(Heap, acima);
     }
  
-    // Step 4: The remaining node is the root node and the tree is complete.
+    // Passo 5: O último elemento do Heap será a raiz da árvore
     return ValMin(Heap);
 }
  
 
-// A utility function to print an array of size n
+// Função para printar array
 void printArray (int array[], int n)
 {
     int i;
@@ -174,26 +175,25 @@ void printArray (int array[], int n)
     printf("\n");
 }
 
-// Prints huffman codes from the root of Huffman Tree.  It uses arr[] to
-// store codes
-void printCodigo(struct NoHeap* raiz, int array[], int acima)
+
+//Printa o código de Huffman da raíz as folhas. int array[] armazenará os códigos.
+void printCodigo(struct NoArvoreH* raiz, int array[], int acima)
 {
-    // Assign 0 to left edge and recur
+    // Tudo a esquerda será igual a 0
     if (raiz->esqr)
     {
         array[acima] = 0;
         printCodigo(raiz->esqr, array, acima + 1);
     }
  
-    // Assign 1 to right edge and recur
-    if (raiz->dir)
-    {
+    // Tudo a direita será igual a 1
+    if (raiz->dir){
+    
         array[acima] = 1;
         printCodigo(raiz->dir, array, acima + 1);
     }
  
-    // If this is a leaf node, then it contains one of the input
-    // characters, print the character and its code from arr[]
+    //Chegou numa folha, então printar!
     if (Folha(raiz))
     {
         printf("%c: ", raiz->val);
@@ -204,10 +204,21 @@ void printCodigo(struct NoHeap* raiz, int array[], int acima)
 //Faz a codificação Huffman
 void CodigoHuffman (char val[], int freq[], int tamanho)
 {
-   //  Construct Huffman Tree
-   struct NoHeap* raiz = ConstroiArvoredeHuffman(val, freq, tamanho);
+   //  Constroi uma Árvore Huffman
+   struct NoArvoreH* raiz = ConstroiArvoredeHuffman(val, freq, tamanho);
  
-   // Print Huffman codes using the Huffman tree built above
-   int array[MAX_TREE], acima = 0;
+   // Printar os códigos
+   int array[MAX_ARV], acima = 0;
    printCodigo(raiz, array, acima);
+
+}
+
+int main(int argc, char * argv[])
+{
+
+    char a[] = {'a', 'b','c' ,'d' ,'e'};
+    int f[] = {4 ,3, 2, 2, 1};
+    CodigoHuffman(a,f,5);
+    return 1;
+
 }
