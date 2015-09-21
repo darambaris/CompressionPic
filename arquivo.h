@@ -39,7 +39,7 @@ typedef struct Bloco {
 
 
 /*leitura simples em binário para o código de huffman */
- char *leArquivo(char[],  int *);
+unsigned char *leArquivo(unsigned char[], unsigned int *);
 
 /*leitura em blocos de 8x8 pixels levando em consideração o cabeçalho do arquivo BMP */
 int *leArquivoEmBlocos(char[], HEADERBMP*, INFOHEADERBMP*,LISTABLOCOS*);

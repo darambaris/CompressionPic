@@ -85,14 +85,13 @@ int iniciaMenu(char** argv, char path[]){
 	
 	switch(opcao){
 		case '1':	{
-			int tamanho;
-			char *dados;
+			unsigned int tamanho;
+			unsigned char *dados;
 			
 			/* lê os bytes do arquivo de imagem e guarda em dados */
 			dados = (char *) leArquivo(path,&tamanho);			
 			
 			/* chama a função que executa o código de huffman (compressão sem perdas) */
-			printf("%d \n",(int)tamanho);
 			compressaoSemPerdas((char *)dados,tamanho);
 
 			break;

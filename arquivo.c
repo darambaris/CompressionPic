@@ -3,7 +3,7 @@
 #include "arquivo.h"
 
 
-char *leArquivo(char path[], int *tam){
+unsigned char *leArquivo(unsigned char path[], unsigned int *tam){
 
 	FILE *arq = fopen(path,"rb");
 	
@@ -17,7 +17,7 @@ char *leArquivo(char path[], int *tam){
 	*tam = ftell(arq);
 	fseek(arq,0,SEEK_SET);
 
-	 char *dados = ( char*)malloc(sizeof( char)*(*tam));
+	unsigned char *dados = ( char*)malloc(sizeof( char)*(*tam));
 	
 	if (dados == NULL){
 		printf("\nErro de Memória \n");
