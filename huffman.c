@@ -175,21 +175,6 @@ void printArray (int array[], int n)
     printf("\n");
 }
 
-//Função para arrumar o vetor
-int arrumaVetor(char * array, int tamanho, char val )
-{
-
-    for(int i = 0; i < tamanho, i++)
-    {
-        if(array[i] == val)
-        {
-            return i;
-        }
-    }
-    return -1;
-
-}
-
 
 
 //Printa o código de Huffman da raíz as folhas. int array[] armazenará os códigos.

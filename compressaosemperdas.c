@@ -77,15 +77,5 @@ int compressaoSemPerdas(char *val, int tamanho){
 
 }
 
-int descompressaoSemPerdas(char *val, int tamanho)
-{
-	int *freq = NULL;
-	char *intpixel = NULL;
-	int tamanhofreq = 0;
 
-	tamanhofreq = eliminaAmbcontFreq(val,tamanho,&intpixel,&freq);
-	CodigoHuffman(intpixel,freq,tamanhofreq);
-	return EXIT_SUCCESS;
-
-}
 
