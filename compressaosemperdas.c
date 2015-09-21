@@ -1,6 +1,6 @@
 /*
  ===========================================================================================================
- Nome         : menu.c
+ Nome         : compressaosemperdas.c
  Autores      : Jéssika Darambaris e Roberto Freitas
  Descrição    : Arquivo responsável por implementar a técnica de compressão sem perdas Código de Huffman 
  ===========================================================================================================
@@ -72,14 +72,27 @@ int compressaoSemPerdas(char * val, int tamanho){
 
 	tamanhofreq = eliminaAmbcontFreq(val,tamanho,&intpixel,&freq);
 	CodigoHuffman(intpixel,freq,tamanhofreq);
+
 	return EXIT_SUCCESS;
 
 }
 
-int main(int argc, char * argv[])
+int descompressaoSemPerdas(char *val, int tamanho)
 {
+	int *freq = NULL;
+	char *intpixel = NULL;
+	int tamanhofreq = 0;
 
-    char a[] =  {'a', 'b','c' ,'d' ,'e', 'a', 'b', 'a', 'b','c', 'd'};
-    compressaoSemPerdas(a, (int) sizeof(a));
-    return 1;
+	tamanhofreq = eliminaAmbcontFreq(val,tamanho,&intpixel,&freq);
+	CodigoHuffman(intpixel,freq,tamanhofreq);
+	return EXIT_SUCCESS;
+
 }
+
+void main (int argc, char * argv[])
+{
+	char a[] =  {'a','b','c','d','e','a','a','b', 'c', 'c', 'c'};
+	compressaoSemPerdas(a, sizeof(a));
+
+}
+
