@@ -34,8 +34,9 @@ void printatudo(char *val, int *freq, int tamanho)
 
 int eliminaAmbcontFreq(char * val, int tamanho, char ** intpixel, int ** freq)
 { 
-	char temp[sizeof(val)];
-	int tempfreq[sizeof(val)];
+
+	char temp[tamanho];
+	int tempfreq[tamanho];
 	int idx = 0, idxf = 0;
 	int idxpesq = 0;
 	
@@ -65,7 +66,6 @@ int eliminaAmbcontFreq(char * val, int tamanho, char ** intpixel, int ** freq)
 
 
 int compressaoSemPerdas(char *val, int tamanho){
-	printf("%d",tamanho);
 	int *freq = NULL;
 	char *intpixel = NULL;
 	int tamanhofreq = 0;
@@ -76,6 +76,3 @@ int compressaoSemPerdas(char *val, int tamanho){
 	return EXIT_SUCCESS;
 
 }
-
-
-

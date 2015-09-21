@@ -197,7 +197,7 @@ void printCodigo(struct NoArvoreH* raiz, int array[], int acima)
     //Chegou numa folha, então printar!
     if (Folha(raiz))
     {
-        printf("%c: ", raiz->val);
+        printf("%d: ", raiz->val);
         printArray(array, acima);
     }
 }
