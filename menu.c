@@ -10,13 +10,15 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "arquivo.h"
+
 #include "CompressaoSemPerdas.c"
 #include "CompressaoComPerdas.c"
 #include "DescompressaoSemPerdas.c"
 #include "DescompressaoComPerdas.c"
 
 #define USAGE "\
-Exemplo de Uso: make nome-da-imagem.bmp \n\
+Exemplo de Uso: ./trabalho nome-da-imagem.bmp \n\
 Obs: Colocar imagem BMP na pasta imagens... \n\n"
 
 
@@ -31,7 +33,7 @@ int main (int argc, char *argv[]){
 		return EXIT_FAILURE;
 	}
 
-	/* inicia o menu */
+	/* abre o arquivo de imagem */
 	if (abreArquivo(argv)) {
 		return EXIT_FAILURE;
 	}	
@@ -47,15 +49,14 @@ int main (int argc, char *argv[]){
 /* trata os parâmetros de entrada, verificando se há alguma imagem .bmp */
 int trataParametrosEntrada(int argc, char** argv){
 	
-	char *img = malloc(sizeof(argv[1]));	
-	strcpy(img,argv[1]);
-
 	if (argc == 1){
 		printf(USAGE);
 		return EXIT_FAILURE;
 	}
 
 	char *ext;
+	char *img = malloc(sizeof(argv[1]));	
+	strcpy(img,argv[1]);
 
 	ext = strtok(img,".");
 	ext = strtok(NULL,".");
@@ -133,20 +134,18 @@ int iniciaMenu(char** argv){
 
 int abreArquivo(char** argv){
 	
+	unsigned int tamanho;
+	unsigned char *dados;
+	
+	/* caminho da imagem */
 	char **path = malloc(sizeof(char *)*4);
 	path[0] = malloc (sizeof(argv[1])+15);
 
 	strcat(path[0],"imagens/");
 	strcat(path[0],argv[1]);
 	
-	FILE *arq = fopen(path[0],"r");
-	
-	if (arq == NULL){
-		printf("\nHouve um erro ao abrir o arquivo. \n");
-		return EXIT_FAILURE;
-	}
+	dados = (char *) leArquivo(path[0],&tamanho);
 
-	fclose(arq);
 
 	return EXIT_SUCCESS;
 }	
