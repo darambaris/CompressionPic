@@ -213,12 +213,3 @@ void CodigoHuffman (char val[], int freq[], int tamanho)
 
 }
 
-int main(int argc, char * argv[])
-{
-
-    char a[] = {'a', 'b','c' ,'d' ,'e'};
-    int f[] = {4 ,3, 2, 2, 1};
-    CodigoHuffman(a,f,5);
-    return 1;
-
-}
