@@ -64,8 +64,8 @@ int eliminaAmbcontFreq(char * val, int tamanho, char ** intpixel, int ** freq)
 }
 
 
-int compressaoSemPerdas(char * val, int tamanho){
-
+int compressaoSemPerdas(char *val, int tamanho){
+	printf("%d",tamanho);
 	int *freq = NULL;
 	char *intpixel = NULL;
 	int tamanhofreq = 0;
@@ -76,10 +76,4 @@ int compressaoSemPerdas(char * val, int tamanho){
 
 }
 
-int main(int argc, char * argv[])
-{
-
-    char a[] =  {'a', 'b','c' ,'d' ,'e', 'a', 'b', 'a', 'b','c', 'd'};
-    compressaoSemPerdas(a, (int) sizeof(a));
-    return 1;
-}
+ 

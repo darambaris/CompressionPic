@@ -3,7 +3,7 @@
 #include "arquivo.h"
 
 
-unsigned char *leArquivo(char path[], unsigned int *tam){
+char *leArquivo(char path[], int *tam){
 
 	FILE *arq = fopen(path,"rb");
 	
@@ -17,14 +17,14 @@ unsigned char *leArquivo(char path[], unsigned int *tam){
 	*tam = ftell(arq);
 	fseek(arq,0,SEEK_SET);
 
-	unsigned char *dados = (unsigned char*)malloc(sizeof(unsigned char)*(*tam));
+	 char *dados = ( char*)malloc(sizeof( char)*(*tam));
 	
 	if (dados == NULL){
 		printf("\nErro de Memória \n");
 		exit(1);
 	}	
 
-	unsigned int verificaLeitura = fread(dados, 1, *tam, arq);
+	 int verificaLeitura = fread(dados, 1, *tam, arq);
 
 	if(verificaLeitura != *tam){
         printf("\nErro na Leitura do Arquivo\n");
@@ -33,4 +33,8 @@ unsigned char *leArquivo(char path[], unsigned int *tam){
 
    fclose(arq);
    return dados;
+}
+
+int *leArquivoEmBlocos(char path[], HEADERBMP *header, INFOHEADERBMP *infoHeader, LISTABLOCOS *bloco){
+	return 0;
 }
