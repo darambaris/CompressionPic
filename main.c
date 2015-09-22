@@ -108,10 +108,7 @@ int iniciaMenu(char** argv, char path[]){
     		//
     		int qtdeBlocos;
     		leArquivoEmBlocos(path, &header, &infoHeader,&vetorBlocos,&qtdeBlocos);
-			//compressaoComPerdas(&vetorBlocos,qtdeBlocos);
-			//descompressaoComPerdas(&vetorBlocos,qtdeBlocos);
-			//printvetorBlocos(vetorBlocos,qtdeBlocos);
-			//gravaArquivoEmBlocos(path,header,infoHeader,vetorBlocos);
+			leArquivoComprimidoDCT("imagens/compressao.dat",&header,&infoHeader);
 			break;
 		}
 		case '3': {
@@ -119,8 +116,6 @@ int iniciaMenu(char** argv, char path[]){
 			// Headers do BMP original
     		HeaderBMP header;
     		InfoHeaderBMP infoHeader;
-
-			leArquivoComprimidoDCT("imagens/compressao.dat",&header,&infoHeader);
 		}	
 	}
 }

@@ -12,7 +12,7 @@
 #include "dct.h"
 
 int compressaoComPerdas(BlocoRGB **vetorBlocos, int qtdeBlocos){
-	int i,zerosR,zerosG,zerosB;
+	int i;
 
 	for (i=0;i<qtdeBlocos;i++){
 		aplicaTransformadaDCT((*vetorBlocos)[i].r);
@@ -23,15 +23,7 @@ int compressaoComPerdas(BlocoRGB **vetorBlocos, int qtdeBlocos){
 	return EXIT_SUCCESS;	
 }
 
-void copiaValoresDeVetores(int vetor[],int vetAux[],int i){
-	int k=0;
-	int lim = i+64;
-	
-	for (i;i<lim;i++){
-		vetor[i] = vetAux[k];
-		k++;
-	}
-}
+
 int descompressaoComPerdas(BlocoRGB **vetorBlocos, int qtdeBlocos){
 	int i;
 
