@@ -113,6 +113,14 @@ int iniciaMenu(char** argv, char path[]){
 			//printvetorBlocos(vetorBlocos,qtdeBlocos);
 			//gravaArquivoEmBlocos(path,header,infoHeader,vetorBlocos);
 			break;
+		}
+		case '3': {
+			
+			// Headers do BMP original
+    		HeaderBMP header;
+    		InfoHeaderBMP infoHeader;
+
+			leArquivoComprimidoDCT("imagens/compressao.dat",&header,&infoHeader);
 		}	
 	}
 }

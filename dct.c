@@ -119,7 +119,149 @@ void desfazTransformadaDCT(int bloco[8][8]){
 	// desloca novamente o nível para cima
 	deslocamentoDeNivel(bloco,128);	
 }
+int contagemDeZeros(int vetor[64], int *pos){
+	int i=63;
+	
+	/* acha a ultima posição que contém valor != 0 */
+	while (i>=0 && vetor[i] == 0) i--;
+	*pos = i;
+	return(63-i);
+}
 
+void vetorizaBlocoZigueZague(int bloco[8][8], int **vetor){
+ 	   (*vetor)[0]=bloco[0][0];
+	   (*vetor)[1]=bloco[0][1];
+	   (*vetor)[2]=bloco[1][0];
+	   (*vetor)[3]=bloco[2][0];	
+	   (*vetor)[4]=bloco[1][1];			
+	   (*vetor)[5]=bloco[0][2];
+       (*vetor)[6]=bloco[0][3];
+	   (*vetor)[7]=bloco[1][2];
+	   (*vetor)[8]=bloco[2][1];
+	   (*vetor)[9]=bloco[3][0];
+	   (*vetor)[10]=bloco[4][0];
+	   (*vetor)[11]=bloco[3][1];
+	   (*vetor)[12]=bloco[2][2];
+	   (*vetor)[13]=bloco[1][3];
+	   (*vetor)[14]=bloco[0][4];
+	   (*vetor)[15]=bloco[0][5];
+	   (*vetor)[16]=bloco[1][4];
+	   (*vetor)[17]=bloco[2][3];
+	   (*vetor)[18]=bloco[3][2];
+	   (*vetor)[19]=bloco[4][1];
+	   (*vetor)[20]=bloco[5][0];
+	   (*vetor)[21]=bloco[6][0];
+	   (*vetor)[22]=bloco[5][1];
+	   (*vetor)[23]=bloco[4][2];
+	   (*vetor)[24]=bloco[3][3];
+	   (*vetor)[25]=bloco[2][4];
+	   (*vetor)[26]=bloco[1][5];
+	   (*vetor)[27]=bloco[0][6];
+	   (*vetor)[28]=bloco[0][7];
+	   (*vetor)[29]=bloco[1][6];
+	   (*vetor)[30]=bloco[2][5];
+	   (*vetor)[31]=bloco[3][4];
+	   (*vetor)[32]=bloco[4][3];
+	   (*vetor)[33]=bloco[5][2];
+	   (*vetor)[34]=bloco[6][1];
+	   (*vetor)[35]=bloco[7][0];
+	   (*vetor)[36]=bloco[7][1];
+	   (*vetor)[37]=bloco[6][2];
+	   (*vetor)[38]=bloco[5][3];
+	   (*vetor)[39]=bloco[4][4];
+	   (*vetor)[40]=bloco[3][5];
+	   (*vetor)[41]=bloco[2][6];
+	   (*vetor)[42]=bloco[1][7];
+	   (*vetor)[43]=bloco[2][7];
+	   (*vetor)[44]=bloco[3][6];
+	   (*vetor)[45]=bloco[4][5];
+	   (*vetor)[46]=bloco[5][4];
+	   (*vetor)[47]=bloco[6][3];
+	   (*vetor)[48]=bloco[7][2];
+	   (*vetor)[49]=bloco[7][3];
+	   (*vetor)[50]=bloco[6][4];
+	   (*vetor)[51]=bloco[5][5];
+	   (*vetor)[52]=bloco[4][6];
+	   (*vetor)[53]=bloco[3][7];
+	   (*vetor)[54]=bloco[4][7];
+	   (*vetor)[55]=bloco[5][6];
+	   (*vetor)[56]=bloco[6][5];
+	   (*vetor)[57]=bloco[7][4];
+	   (*vetor)[58]=bloco[7][5];
+	   (*vetor)[59]=bloco[6][6];
+	   (*vetor)[60]=bloco[5][7];
+	   (*vetor)[61]=bloco[6][7];
+	   (*vetor)[62]=bloco[7][6];
+	   (*vetor)[63]=bloco[7][7];
+}
+
+void desvetorizaZigueZague(int bloco[8][8],int **vetor){
+	//faz o zig zague de volta 
+      bloco[0][0]=(*vetor)[0];
+	  bloco[0][1]=(*vetor)[1];
+	  bloco[1][0]=(*vetor)[2];
+	  bloco[2][0]=(*vetor)[3];
+      bloco[1][1]=(*vetor)[4];
+      bloco[0][2]=(*vetor)[5];
+      bloco[0][3]=(*vetor)[6];
+      bloco[1][2]=(*vetor)[7];
+	  bloco[2][1]=(*vetor)[8];
+	  bloco[3][0]=(*vetor)[9];
+	  bloco[4][0]=(*vetor)[10];
+	  bloco[3][1]=(*vetor)[11];
+	  bloco[2][2]=(*vetor)[12];
+	  bloco[1][3]=(*vetor)[13];
+	  bloco[0][4]=(*vetor)[14];
+	  bloco[0][5]=(*vetor)[15];
+	  bloco[1][4]=(*vetor)[16];
+	  bloco[2][3]=(*vetor)[17];
+	  bloco[3][2]=(*vetor)[18];
+      bloco[4][1]=(*vetor)[19];
+      bloco[5][0]=(*vetor)[20];
+      bloco[6][0]=(*vetor)[21];
+      bloco[5][1]=(*vetor)[22];
+      bloco[4][2]=(*vetor)[23];
+      bloco[3][3]=(*vetor)[24];
+      bloco[2][4]=(*vetor)[25];
+      bloco[1][5]=(*vetor)[26];
+      bloco[0][6]=(*vetor)[27];
+      bloco[0][7]=(*vetor)[28];
+      bloco[1][6]=(*vetor)[29];
+      bloco[2][5]=(*vetor)[30];
+      bloco[3][4]=(*vetor)[31];
+      bloco[4][3]=(*vetor)[32];
+      bloco[5][2]=(*vetor)[33];
+      bloco[6][1]=(*vetor)[34];
+      bloco[7][0]=(*vetor)[35];
+      bloco[7][1]=(*vetor)[36];
+      bloco[6][2]=(*vetor)[37];
+      bloco[5][3]=(*vetor)[38];
+      bloco[4][4]=(*vetor)[39];
+      bloco[3][5]=(*vetor)[40];
+	  bloco[2][6]=(*vetor)[41];
+	  bloco[1][7]=(*vetor)[42];
+	  bloco[2][7]=(*vetor)[43];
+	  bloco[3][6]=(*vetor)[44];
+	  bloco[4][5]=(*vetor)[45];
+	  bloco[5][4]=(*vetor)[46];
+	  bloco[6][3]=(*vetor)[47];
+	  bloco[7][2]=(*vetor)[48];
+	  bloco[7][3]=(*vetor)[49];
+	  bloco[6][4]=(*vetor)[50];
+	  bloco[5][5]=(*vetor)[51];
+	  bloco[4][6]=(*vetor)[52];
+	  bloco[3][7]=(*vetor)[53];
+	  bloco[4][7]=(*vetor)[54];
+	  bloco[5][6]=(*vetor)[55];
+	  bloco[6][5]=(*vetor)[56];
+	  bloco[7][4]=(*vetor)[57];
+	  bloco[7][5]=(*vetor)[58];
+	  bloco[6][6]=(*vetor)[59];
+	  bloco[5][7]=(*vetor)[60];
+	  bloco[6][7]=(*vetor)[61];
+	  bloco[7][6]=(*vetor)[62];
+	  bloco[7][7]=(*vetor)[63];	
+}
 /*int main (int argc, char *argv[]){
 	int teste[8][8] = {
 	{ 52, 55, 61, 66,  70,  61,  64,  73 },

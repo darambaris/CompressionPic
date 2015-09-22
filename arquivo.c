@@ -37,6 +37,62 @@ unsigned char *leArquivo(unsigned char path[], unsigned int *tam){
    return dados;
 }
 
+int leArquivoComprimidoDCT(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader){
+	
+	/* numero mágico do cabeçalho bmp */
+	NumMagicoBMP numMagic; 
+	int numBlocosLargura, numBlocosAltura;
+	int restoPixelsLargura, restoPixelsAltura;
+	/* abre o arquivo em modo leitura para binário */
+	FILE *arq = fopen(path,"rb");
+
+	if (arq == NULL){
+		printf("\nHouve um erro ao abrir o arquivo. \n");
+		exit(1);
+	}
+
+	/* lê o número mágico que possui 2 bytes */
+	fread(&numMagic, 2, 1, arq);
+	
+	/* lê o cabeçalho do bmp */
+	fread(header, sizeof(HeaderBMP),1, arq);
+
+	/* lẽ as informações contidas sobre o cabeçalho bmp */
+	fread(infoHeader, sizeof(InfoHeaderBMP), 1, arq);
+
+	int *vetorR = (int *) malloc(sizeof(int)*64);
+	int *vetorG = (int *) malloc(sizeof(int)*64);
+	int *vetorB = (int *) malloc(sizeof(int)*64);
+	
+	int zerosR, zerosG, zerosB,qtde_blocos=0,i;
+
+	while (1){
+
+		zerosR = fgetc(arq);
+		
+		if(zerosR == EOF) break;
+		qtde_blocos++;
+
+		for (i=0;i<zerosR;i++) vetorR[i]= fgetc(arq);
+		for (i;i<64;i++) vetorR[i] = 0;
+
+		zerosG = fgetc(arq);
+		for (i=0;i<zerosG;i++) vetorG[i]= fgetc(arq);
+		for (i;i<64;i++) vetorG[i] = 0;
+		
+		zerosB = fgetc(arq);
+		for (i=0;i<zerosB;i++) vetorB[i]= fgetc(arq);
+		for (i;i<64;i++) vetorB[i] = 0;	
+	}		
+
+	free(vetorR);
+	free(vetorR);
+	free(vetorR);
+	
+	fclose(arq);
+
+}
+
 int *leArquivoEmBlocos(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader, BlocoRGB **vetBlocosMain, int *qtdeBlocos){
 	/* numero mágico do cabeçalho bmp */
 	NumMagicoBMP numMagic; 
@@ -74,7 +130,7 @@ int *leArquivoEmBlocos(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader
 	BlocoRGB *vetorBlocos = (BlocoRGB *) malloc(sizeof(BlocoRGB)*((numBlocosLargura+1)*(numBlocosAltura+1)));
 	*vetBlocosMain = (BlocoRGB *) malloc(sizeof(BlocoRGB)*((numBlocosLargura+1)*(numBlocosAltura+1)));
 
-	if(restoPixelsLargura) printf("TEM SOBRA!!!");
+
 
 	int col,lin,k,i,j,qtde_blocos = 0,qtde_colunas=8;
 	
@@ -150,14 +206,66 @@ int *leArquivoEmBlocos(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader
 	}*/
 	
 	compressaoComPerdas(&vetorBlocos,*qtdeBlocos);
-	descompressaoComPerdas(&vetorBlocos,*qtdeBlocos);
+	//descompressaoComPerdas(&vetorBlocos,*qtdeBlocos);
 	
-	
-	gravaArquivoEmBlocos(path,*header,*infoHeader,vetorBlocos);
+	gravaArquivoComprimidoDCT(path,*header,*infoHeader,vetorBlocos, qtde_blocos);
+	//gravaArquivoEmBlocos(path,*header,*infoHeader,vetorBlocos);
 
 	free(vetorBlocos);
 	fclose(arq);
 }
+
+int gravaArquivoComprimidoDCT(char path[], HeaderBMP header, InfoHeaderBMP infoHeader, BlocoRGB vetorBlocos[], int qtdeBlocos){
+	/*path = strtok(path,"/");
+	path = strtok(NULL,"/");
+
+	char *nomeArquivo = malloc (sizeof(path)+30);
+	strcat(nomeArquivo, "imagens/");
+	strcat(nomeArquivo, "com-perdas-");
+	path = strtok(NULL,".");
+	strcat(nomeArquivo,path);
+	strcat(nomeArquivo,".dat");*/
+
+	FILE *arq = fopen("imagens/compressao.dat","wb+");
+	unsigned short numMagic = 19778;
+
+	// salva o header de arquivo (fheader) com 14 bytes
+    fwrite(&numMagic, 2, 1, arq);
+    fwrite(&header, sizeof(HeaderBMP), 1, arq);
+    
+    // salva o header de informacoes (iheader).
+    fwrite(&infoHeader, sizeof(InfoHeaderBMP), 1, arq);
+
+    int zerosR,zerosG,zerosB,posR,posG,posB,i,j;
+  	
+  	int *vetorR = (int *) malloc (sizeof(int)*64);
+  	int *vetorG = (int *) malloc (sizeof(int)*64);
+  	int *vetorB = (int *) malloc (sizeof(int)*64);
+
+	for (i=0;i<qtdeBlocos;i++){
+		vetorizaBlocoZigueZague(vetorBlocos[i].r,&vetorR);
+		vetorizaBlocoZigueZague(vetorBlocos[i].g,&vetorG);
+		vetorizaBlocoZigueZague(vetorBlocos[i].b,&vetorB);
+		
+		zerosR = contagemDeZeros(vetorR,&posR);
+		zerosG = contagemDeZeros(vetorG,&posG);
+		zerosB = contagemDeZeros(vetorB,&posB);
+
+		fputc(zerosR,arq);	
+		for (j=0;j<posR;j++) fputc(vetorR[i],arq);
+		fputc(zerosG,arq);
+		for (j=0;j<posG;j++) fputc(vetorG[i],arq);
+		fputc(zerosB,arq);
+		for (j=0;j<posB;j++) fputc(vetorB[i],arq);
+		
+	}
+
+	free(vetorR);
+	free(vetorG);
+	free(vetorB);
+    //free(nomeArquivo);
+    fclose(arq);
+} 
 
 int gravaArquivoEmBlocos(char path[],HeaderBMP header, InfoHeaderBMP infoHeader,BlocoRGB vetorBlocos[]){
 	
