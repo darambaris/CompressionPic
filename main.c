@@ -11,11 +11,11 @@
 #include <stdlib.h>
 
 #include "arquivo.h"
+#include "comPerdas.h"
 
 #include "compressaosemperdas.c"
-#include "CompressaoComPerdas.c"
-#include "DescompressaoSemPerdas.c"
-#include "DescompressaoComPerdas.c"
+//#include "CompressaoComPerdas.c"
+//#include "DescompressaoSemPerdas.c"
 
 #define USAGE "\
 Exemplo de Uso: ./trabalho nome-da-imagem.bmp \n\
@@ -97,18 +97,21 @@ int iniciaMenu(char** argv, char path[]){
 			break;
 		}	 
 		case '2':	{	
-			if (compressaoComPerdas())
-				return EXIT_FAILURE;	
-			break;
-		}	
-		case '3':	{
-			if (compressaoComPerdas())
-				return EXIT_FAILURE;			
-			break;
-		}	
-		case '4':	{
-			if (compressaoComPerdas())
-				return EXIT_FAILURE;		
+			
+			// Headers do BMP original
+    		HeaderBMP header;
+    		InfoHeaderBMP infoHeader;
+    		
+    		// vetor de blocos RGB
+    		BlocoRGB *vetorBlocos;
+
+    		//
+    		int qtdeBlocos;
+    		leArquivoEmBlocos(path, &header, &infoHeader,&vetorBlocos,&qtdeBlocos);
+			//compressaoComPerdas(&vetorBlocos,qtdeBlocos);
+			//descompressaoComPerdas(&vetorBlocos,qtdeBlocos);
+			//printvetorBlocos(vetorBlocos,qtdeBlocos);
+			//gravaArquivoEmBlocos(path,header,infoHeader,vetorBlocos);
 			break;
 		}	
 	}

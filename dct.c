@@ -9,20 +9,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-//#include "dct.h"
+#include "dct.h"
 #define PI 3.14159265
-#define N 8
 
 /* a matriz de quantização utilizada é a típica de luminância para jpeg */
-int matrizQuantizacao[8][8] = {
-	{ 16, 11, 10, 16,  24,  40,  51,  61 },
-	{ 12, 12, 14, 19,  26,  58,  60,  55 },
-	{ 14, 13, 16, 24,  40,  57,  69,  56 },
-	{ 14, 17, 22, 29,  51,  87,  80,  62 },
-	{ 18, 22, 37, 56,  68, 109, 103,  77 },
-	{ 24, 35, 55, 64,  81, 104, 113,  92 },
-	{ 49, 64, 78, 87, 103, 121, 120, 101 },
-	{ 72, 92, 95, 98, 112, 100, 103,  99 }
+double matrizQuantizacao[8][8] = {
+	{ 16.0, 11.0, 10.0, 16.0,  24.0,  40.0,  51.0,  61.0 },
+	{ 12.0, 12.0, 14.0, 19.0,  26.0,  58.0,  60.0,  55.0 },
+	{ 14.0, 13.0, 16.0, 24.0,  40.0,  57.0,  69.0,  56.0 },
+	{ 14.0, 17.0, 22.0, 29.0,  51.0,  87.0,  80.0,  62.0 },
+	{ 18.0, 22.0, 37.0, 56.0,  68.0, 109.0, 103.0,  77.0 },
+	{ 24.0, 35.0, 55.0, 64.0,  81.0, 104.0, 113.0,  92.0 },
+	{ 49.0, 64.0, 78.0, 87.0, 103.0, 121.0, 120.0, 101.0 },
+	{ 72.0, 92.0, 95.0, 98.0, 112.0, 100.0, 103.0,  99.0 }
 };
 
 /* Obs: Muitos coeficientes apresentarão valores próximos a zero, podendo ser 
@@ -41,16 +40,18 @@ void deslocamentoDeNivel(int bloco[8][8], int nivel) {
 /* função alfa da fórmula */
 double funcao_alfa (int index) {
 	if (index == 0) 
-		return (double) (1.0/ (double)(2.0 * sqrt(2))); // sqrt(2/8) = 1 / sqrt(2)*2
+		return (double) (1.0/3.0); // sqrt(2/8) = 1 / sqrt(2)*2
 	else
 		return 0.5; // sqrt(1/8)
 }
 
+
 /* aplica a transformada DCT nos dados espaciais por bloco de 8x8 pixels */
 void aplicaTransformadaDCT(int bloco[8][8]) {
+	
 	int i,j,x,y;
 	
-	deslocamentoDeNivel(bloco,-127);
+	deslocamentoDeNivel(bloco,-128);
 	
 	double aux[8][8];
 	
@@ -77,7 +78,7 @@ void aplicaTransformadaDCT(int bloco[8][8]) {
 	// são responsáveis pela perda de precisão.
 	for (i = 0; i < 8; i++) {
 		for (j = 0; j < 8; j++) {
-			bloco[i][j] = aux[i][j] / (double) matrizQuantizacao[i][j];
+			bloco[i][j] = (int) (aux[i][j]/matrizQuantizacao[i][j]);
 		}
 	}
 }
@@ -90,7 +91,7 @@ void desfazTransformadaDCT(int bloco[8][8]){
 	//para desfazer a transformada deve-se multiplicá-la pela matrizQuantização
 	for (i=0; i<8; i++){
 		for (j=0; j<8; j++){
-			aux[i][j] = bloco[i][j] * (double) matrizQuantizacao[i][j];
+			aux[i][j] = (double) (bloco[i][j]*matrizQuantizacao[i][j]);
 		}
 	}
 
@@ -106,22 +107,22 @@ void desfazTransformadaDCT(int bloco[8][8]){
 					sum += (funcao_alfa(i) * funcao_alfa(j) * aux[i][j] *  cos1 * cos2) ;
 				}
 			}
-			bloco[x][y] = sum;
+			bloco[x][y] = (int) sum;
 			
 
 			// a quantizacao inversa pode fazer com que -128 vire -129, ou 127 vire 128, por exemplo
 			// quando formos salvar a imagem como char ao inves de int, temos alguns probleminhas...
 			// para resolver isso, precisamos desse if
-			/*if (bloco[x][y] > 127) bloco[x][y] = 127;
-			else if (bloco[x][y] < - 128) bloco[x][y] = -128; VER SE SERÁ NECESSÁRIO DEPOIS */
+			//if (bloco[x][y]==128) bloco[x][y] = 127;
+			//else if (bloco[x][y]==-129) bloco[x][y] = -128; 
 		}
 	}
 
 	// desloca novamente o nível para cima
-	deslocamentoDeNivel(bloco,127);	
+	deslocamentoDeNivel(bloco,128);	
 }
 
-int main (int argc, char *argv[]){
+/*int main (int argc, char *argv[]){
 	int teste[8][8] = {
 	{ 52, 55, 61, 66,  70,  61,  64,  73 },
 	{ 63, 59, 55, 90,  109,  85,  69,  72 },
@@ -144,4 +145,4 @@ int main (int argc, char *argv[]){
 		}
 		printf("\n");
 	}
-}
+}*/

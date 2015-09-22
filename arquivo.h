@@ -1,16 +1,17 @@
 #ifndef ARQUIVO_H
 #define ARQUIVO_H
+
 	
 typedef struct {
      short bfType;       /* Magic number for file */
-} BMPMAGICNUMBER;
+} NumMagicoBMP;
 
 typedef struct {
      int   bfSize;       /* Size of file */
      short bfReserved1;  /* Reserved */
      short bfReserved2;  /* ... */
      int   bfOffBits;    /* Offset to bitmap data */
-} HEADERBMP;
+} HeaderBMP;
 
 /* bfType deve ser = "MB" */
 
@@ -27,23 +28,26 @@ typedef struct {
     int            biYPelsPerMeter; /* Y pixels per meter */
      int   biClrUsed;       /* Number of colors used */
      int   biClrImportant;  /* Number of important colors */
-} INFOHEADERBMP;
+} InfoHeaderBMP;
 
 /* blocos 8x8 que formam a imagem em RGB*/
-typedef struct Bloco {
+typedef struct {
     int r[8][8];
     int g[8][8];
     int b[8][8];
-    struct Bloco *next;
-} LISTABLOCOS;
+} BlocoRGB;
 
 
 /*leitura simples em binário para o código de huffman */
 unsigned char *leArquivo(unsigned char[], unsigned int *);
 
 /*leitura em blocos de 8x8 pixels levando em consideração o cabeçalho do arquivo BMP */
-int *leArquivoEmBlocos(char[], HEADERBMP*, INFOHEADERBMP*,LISTABLOCOS*);
+int *leArquivoEmBlocos(char[], HeaderBMP*, InfoHeaderBMP*,BlocoRGB**,int*);
 
-int escreveArquivo(char,  char,  int);
+int escreveArquivo(char,char,int);
+
+int gravaArquivoEmBlocos(char[],HeaderBMP, InfoHeaderBMP,BlocoRGB[]);
+
+void printvetorBlocos(BlocoRGB[],int);
 
 #endif
