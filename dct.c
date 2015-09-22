@@ -40,9 +40,9 @@ void deslocamentoDeNivel(int bloco[8][8], int nivel) {
 /* função alfa da fórmula */
 double funcao_alfa (int index) {
 	if (index == 0) 
-		return (double) (1.0/3.0); // sqrt(2/8) = 1 / sqrt(2)*2
+		return (double)  0.5/sqrt(2); // sqrt(1/8) = 1 / sqrt(2)*2
 	else
-		return 0.5; // sqrt(1/8)
+		return 0.5; // sqrt(2/8)
 }
 
 
@@ -78,7 +78,7 @@ void aplicaTransformadaDCT(int bloco[8][8]) {
 	// são responsáveis pela perda de precisão.
 	for (i = 0; i < 8; i++) {
 		for (j = 0; j < 8; j++) {
-			bloco[i][j] = (int) (aux[i][j]/matrizQuantizacao[i][j]);
+			bloco[i][j] = (int) (aux[i][j] / matrizQuantizacao[i][j]);
 		}
 	}
 }
@@ -91,7 +91,7 @@ void desfazTransformadaDCT(int bloco[8][8]){
 	//para desfazer a transformada deve-se multiplicá-la pela matrizQuantização
 	for (i=0; i<8; i++){
 		for (j=0; j<8; j++){
-			aux[i][j] = (double) (bloco[i][j]*matrizQuantizacao[i][j]);
+			aux[i][j] = ((double)bloco[i][j] * (double) matrizQuantizacao[i][j]);
 		}
 	}
 
@@ -107,14 +107,14 @@ void desfazTransformadaDCT(int bloco[8][8]){
 					sum += (funcao_alfa(i) * funcao_alfa(j) * aux[i][j] *  cos1 * cos2) ;
 				}
 			}
-			bloco[x][y] = (int) sum;
+			bloco[x][y] = sum;
 			
 
 			// a quantizacao inversa pode fazer com que -128 vire -129, ou 127 vire 128, por exemplo
 			// quando formos salvar a imagem como char ao inves de int, temos alguns probleminhas...
 			// para resolver isso, precisamos desse if
-			//if (bloco[x][y]==128) bloco[x][y] = 127;
-			//else if (bloco[x][y]==-129) bloco[x][y] = -128; 
+			if (bloco[x][y] > 127) bloco[x][y] = 127;
+			else if (bloco[x][y] < - 128) bloco[x][y] = -128; 
 		}
 	}
 

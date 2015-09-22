@@ -119,7 +119,7 @@ int *leArquivoEmBlocos(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader
 		qtde_blocos += (restoPixelsLargura)?numBlocosLargura+1:numBlocosLargura;
 	}
 
-	if(!restoPixelsAltura) qtde_blocos -= (restoPixelsLargura)?numBlocosLargura+1:numBlocosLargura;
+	//if(!restoPixelsAltura) qtde_blocos -= (restoPixelsLargura)?numBlocosLargura+1:numBlocosLargura;
 	
 
 	if(restoPixelsAltura){
@@ -149,10 +149,10 @@ int *leArquivoEmBlocos(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader
 		}
 	}*/
 	
-	//compressaoComPerdas(&vetorBlocos,*qtdeBlocos);
-	//descompressaoComPerdas(&vetorBlocos,*qtdeBlocos);
+	compressaoComPerdas(&vetorBlocos,*qtdeBlocos);
+	descompressaoComPerdas(&vetorBlocos,*qtdeBlocos);
 	
-	//printvetorBlocos(vetorBlocos,qtde_blocos);
+	
 	gravaArquivoEmBlocos(path,*header,*infoHeader,vetorBlocos);
 
 	free(vetorBlocos);
@@ -160,7 +160,7 @@ int *leArquivoEmBlocos(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader
 }
 
 int gravaArquivoEmBlocos(char path[],HeaderBMP header, InfoHeaderBMP infoHeader,BlocoRGB vetorBlocos[]){
-	FILE *arq = fopen("imagens/transformada.bmp","wb+");
+	FILE *arq = fopen("imagens/transformada5.bmp","wb+");
 	unsigned short numMagic = 19778;
 
 	// salva o header de arquivo (fheader) com 14 bytes
@@ -189,7 +189,7 @@ int gravaArquivoEmBlocos(char path[],HeaderBMP header, InfoHeaderBMP infoHeader,
 			if (!restoPixelsAltura) break;
 			qtde_colunas = restoPixelsAltura;
 		}
-		
+
 		for (k=0;k<qtde_colunas;k++){	
 			/* pega os valores RGB de uma linha até um número múltiplo de 8 */
 			for (lin=0;lin<numBlocosLargura;lin++){
