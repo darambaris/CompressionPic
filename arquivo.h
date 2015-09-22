@@ -43,10 +43,13 @@ unsigned char *leArquivo(unsigned char[], unsigned int *);
 
 /*leitura em blocos de 8x8 pixels levando em consideração o cabeçalho do arquivo BMP */
 int *leArquivoEmBlocos(char[], HeaderBMP*, InfoHeaderBMP*,BlocoRGB**,int*);
+int leArquivoComprimidoDCT(char[],HeaderBMP*,InfoHeaderBMP*);
 
 int escreveArquivo(char,char,int);
 
 int gravaArquivoEmBlocos(char[],HeaderBMP, InfoHeaderBMP,BlocoRGB[]);
+
+int gravaArquivoComprimidoDCT(char[],HeaderBMP,InfoHeaderBMP,BlocoRGB[],int);
 
 void printvetorBlocos(BlocoRGB[],int);
 

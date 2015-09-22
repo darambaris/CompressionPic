@@ -19,11 +19,10 @@ int compressaoComPerdas(BlocoRGB **vetorBlocos, int qtdeBlocos){
 		aplicaTransformadaDCT((*vetorBlocos)[i].g);
 		aplicaTransformadaDCT((*vetorBlocos)[i].b);
 	}
-
-
-
+	
 	return EXIT_SUCCESS;	
 }
+
 
 int descompressaoComPerdas(BlocoRGB **vetorBlocos, int qtdeBlocos){
 	int i;
@@ -37,6 +36,3 @@ int descompressaoComPerdas(BlocoRGB **vetorBlocos, int qtdeBlocos){
 	return EXIT_SUCCESS;
 }
 
-int vetorizarBlocos(){
-	
-}

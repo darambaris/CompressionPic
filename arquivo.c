@@ -37,6 +37,83 @@ unsigned char *leArquivo(unsigned char path[], unsigned int *tam){
    return dados;
 }
 
+int leArquivoComprimidoDCT(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader){
+	
+	/* numero mágico do cabeçalho bmp */
+	NumMagicoBMP numMagic; 
+	int numBlocosLargura, numBlocosAltura;
+	int restoPixelsLargura, restoPixelsAltura;
+	/* abre o arquivo em modo leitura para binário */
+	FILE *arq = fopen(path,"rb");
+
+	if (arq == NULL){
+		printf("\nHouve um erro ao abrir o arquivo. \n");
+		exit(1);
+	}
+
+	/* lê o número mágico que possui 2 bytes */
+	fread(&numMagic, 2, 1, arq);
+	
+	/* lê o cabeçalho do bmp */
+	fread(header, sizeof(HeaderBMP),1, arq);
+
+	/* lẽ as informações contidas sobre o cabeçalho bmp */
+	fread(infoHeader, sizeof(InfoHeaderBMP), 1, arq);
+
+
+	char *vetorR = (char *) malloc(sizeof(char)*64);
+	char *vetorG = (char *) malloc(sizeof(char)*64);
+	char *vetorB = (char *) malloc(sizeof(char)*64);
+	
+	int zerosR, zerosG, zerosB,qtde_blocos=0,i;
+
+
+	BlocoRGB *vetorBlocos = (BlocoRGB *) malloc (sizeof(BlocoRGB));
+	
+	while (1){
+			
+		zerosR = fgetc(arq);
+
+		if (zerosR == EOF) break; 
+
+		qtde_blocos+=1;
+
+
+		vetorBlocos = realloc (vetorBlocos,sizeof(BlocoRGB)*(qtde_blocos));
+		for (i=0;i<=(63-zerosR);i++) vetorR[i]= fgetc(arq);
+		for (i;i<64;i++) vetorR[i] = 0;
+
+		zerosG = fgetc(arq);
+		
+		for (i=0;i<=(63-zerosG);i++) vetorG[i]= fgetc(arq);
+		for (i;i<64;i++) vetorG[i] = 0;
+		
+		zerosB = fgetc(arq);
+		
+		for (i=0;i<=(63-zerosB);i++) vetorB[i]= fgetc(arq);
+		for (i;i<64;i++) vetorB[i] = 0;	
+
+		desvetorizaBlocoZigueZague(vetorBlocos[qtde_blocos-1].r,&vetorR);
+		desvetorizaBlocoZigueZague(vetorBlocos[qtde_blocos-1].g,&vetorG);
+		desvetorizaBlocoZigueZague(vetorBlocos[qtde_blocos-1].b,&vetorB);	
+	}	
+	printf("%d\n",qtde_blocos);	
+	//compressaoComPerdas(&vetorBlocos,qtde_blocos);
+	descompressaoComPerdas(&vetorBlocos,qtde_blocos);
+	
+	//printvetorBlocos(vetorBlocos,qtde_blocos);
+	gravaArquivoEmBlocos(path,*header,*infoHeader,vetorBlocos);
+
+	free(vetorR);
+	free(vetorG);
+	free(vetorB);
+	free(vetorBlocos);
+
+	fclose(arq);
+	
+
+}
+
 int *leArquivoEmBlocos(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader, BlocoRGB **vetBlocosMain, int *qtdeBlocos){
 	/* numero mágico do cabeçalho bmp */
 	NumMagicoBMP numMagic; 
@@ -72,9 +149,9 @@ int *leArquivoEmBlocos(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader
 	
 	/* calcula tamanho inicial do vetor de Blocos */ 
 	BlocoRGB *vetorBlocos = (BlocoRGB *) malloc(sizeof(BlocoRGB)*((numBlocosLargura+1)*(numBlocosAltura+1)));
-	*vetBlocosMain = (BlocoRGB *) malloc(sizeof(BlocoRGB)*((numBlocosLargura+1)*(numBlocosAltura+1)));
+	//*vetBlocosMain = (BlocoRGB *) malloc(sizeof(BlocoRGB)*((numBlocosLargura)*(numBlocosAltura)));
 
-	if(restoPixelsLargura) printf("TEM SOBRA!!!");
+
 
 	int col,lin,k,i,j,qtde_blocos = 0,qtde_colunas=8;
 	
@@ -113,14 +190,12 @@ int *leArquivoEmBlocos(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader
 				}
 
 			}
+	
 				
 		}	
 
 		qtde_blocos += (restoPixelsLargura)?numBlocosLargura+1:numBlocosLargura;
 	}
-
-	//if(!restoPixelsAltura) qtde_blocos -= (restoPixelsLargura)?numBlocosLargura+1:numBlocosLargura;
-	
 
 	if(restoPixelsAltura){
 		for (k=restoPixelsAltura;k<8;k++){
@@ -135,41 +210,90 @@ int *leArquivoEmBlocos(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader
 
 				}
 		}
+
 	}
 
-	*qtdeBlocos = qtde_blocos;
-	/*copia vetor para main */
-	/*for (i=0;i<qtde_blocos;i++){
-		for (k=0;k<8;k++){
-			for (j=0;j<8;j++){
-				(*vetBlocosMain)[i].r[j][k] = vetorBlocos[i].r[j][k];
-				(*vetBlocosMain)[i].r[j][k] = vetorBlocos[i].g[j][k];
-				(*vetBlocosMain)[i].r[j][k] = vetorBlocos[i].b[j][k];
-			}
-		}
-	}*/
-	
-	compressaoComPerdas(&vetorBlocos,*qtdeBlocos);
-	descompressaoComPerdas(&vetorBlocos,*qtdeBlocos);
-	
-	
-	gravaArquivoEmBlocos(path,*header,*infoHeader,vetorBlocos);
+	printf("%d\n",qtde_blocos);	
 
+
+	compressaoComPerdas(&vetorBlocos,qtde_blocos);
+	//descompressaoComPerdas(&vetorBlocos,qtde_blocos);
+	
+	gravaArquivoComprimidoDCT(path,*header,*infoHeader,vetorBlocos, qtde_blocos);
+	//gravaArquivoEmBlocos(path,*header,*infoHeader,vetorBlocos);
+	//printvetorBlocos(vetorBlocos,qtde_blocos-lin);
 	free(vetorBlocos);
 	fclose(arq);
 }
 
+int gravaArquivoComprimidoDCT(char path[], HeaderBMP header, InfoHeaderBMP infoHeader, BlocoRGB vetorBlocos[], int qtdeBlocos){
+	/*path = strtok(path,"/");
+	path = strtok(NULL,"/");
+	
+	char *nomeArquivo = malloc (sizeof(path)+30);
+	strcat(nomeArquivo, "imagens/");
+	strcat(nomeArquivo, "com-perdas-");
+	path = strtok(NULL,".");
+	strcat(nomeArquivo,path);
+	strcat(nomeArquivo,".dat");*/
+
+	FILE *arq = fopen("imagens/compressao.dat","wb+");
+	
+	if(arq==NULL) printf("Erro abrir arquivo");
+
+	unsigned short numMagic = 19778;
+
+	// salva o header de arquivo (fheader) com 14 bytes
+    fwrite(&numMagic, 2, 1, arq);
+    fwrite(&header, sizeof(HeaderBMP), 1, arq);
+    
+    // salva o header de informacoes (iheader).
+    fwrite(&infoHeader, sizeof(InfoHeaderBMP), 1, arq);
+
+    int zerosR,zerosG,zerosB,posR,posG,posB,i,j;
+  
+  	char *vetorR = (char *) malloc (sizeof(char)*64);
+  	char *vetorG = (char *) malloc (sizeof(char)*64);
+  	char *vetorB = (char *) malloc (sizeof(char)*64);
+
+	for (i=0;i<qtdeBlocos;i++){
+		vetorizaBlocoZigueZague(vetorBlocos[i].r,&vetorR);
+		vetorizaBlocoZigueZague(vetorBlocos[i].g,&vetorG);
+		vetorizaBlocoZigueZague(vetorBlocos[i].b,&vetorB);
+		
+		zerosR = contagemDeZeros(vetorR,&posR);
+		zerosG = contagemDeZeros(vetorG,&posG);
+		zerosB = contagemDeZeros(vetorB,&posB);
+		
+		fputc(zerosR,arq);	
+		for (j=0;j<=posR;j++) fputc(vetorR[j],arq);
+		
+		fputc(zerosG,arq);
+		for (j=0;j<=posG;j++) fputc(vetorG[j],arq);
+		
+		fputc(zerosB,arq);
+		for (j=0;j<=posB;j++) fputc(vetorB[j],arq);
+		
+	}
+
+	free(vetorR);
+	free(vetorG);
+	free(vetorB);
+    //free(nomeArquivo);
+    fclose(arq);
+} 
+
 int gravaArquivoEmBlocos(char path[],HeaderBMP header, InfoHeaderBMP infoHeader,BlocoRGB vetorBlocos[]){
 	
-	path = strtok(path,"/");
+	/*path = strtok(path,"/");
 	path = strtok(NULL,"/");
 
 	char *nomeArquivo = malloc (sizeof(path)+30);
 	strcat(nomeArquivo, "imagens/");
 	strcat(nomeArquivo, "com-perdas-");
-	strcat(nomeArquivo,path);
+	strcat(nomeArquivo,path);*/
 
-	FILE *arq = fopen(nomeArquivo,"wb+");
+	FILE *arq = fopen("imagens/descompressaoComPerdas.bmp","wb+");
 	unsigned short numMagic = 19778;
 
 	// salva o header de arquivo (fheader) com 14 bytes
@@ -214,7 +338,7 @@ int gravaArquivoEmBlocos(char path[],HeaderBMP header, InfoHeaderBMP infoHeader,
 		}
 		qtde_blocos += (restoPixelsLargura)?numBlocosLargura+1:numBlocosLargura;
 	}
-	free(nomeArquivo);
+	//free(nomeArquivo);
 	fclose(arq);
 }
 
