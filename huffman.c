@@ -16,7 +16,7 @@
 //Nó da Árvore de Huffman
 struct NoArvoreH
 {
-    char val;  // Valor do pixel inserido na árvore
+    unsigned char val;  // Valor do pixel inserido na árvore
     unsigned freq;  // Frequencia do pixel inserido
     struct NoArvoreH *esqr, *dir; // Nós da esquerda e da direita da árvore
 };
@@ -27,6 +27,15 @@ struct Heap
     unsigned tamanho;    // Tamanho
     unsigned capacidade;   // Capacidade da Árvore
     struct NoArvoreH **array;  // Array de Nós de ArvoreH.
+};
+
+//Tabela de Huffman
+struct TabelaHuff
+{
+    unsigned char *valor;
+    int *acima;
+    int **codigohuffman;
+    unsigned int tamanho;
 };
 
 // Cria um Heap
@@ -41,7 +50,7 @@ struct Heap* CriarHeap(unsigned capacidade)
 
 
 //Cria um nó da Árvore
-struct NoArvoreH* NovoNo (char val, unsigned freq)
+struct NoArvoreH* NovoNo (unsigned char val, unsigned freq)
 {
     struct NoArvoreH* temp = (struct NoArvoreH*) malloc(sizeof(struct NoArvoreH));
     temp->esqr = temp->dir = NULL;
@@ -164,10 +173,13 @@ struct NoArvoreH* ConstroiArvoredeHuffman (char val[], int freq[], int tamanho)
     // Passo 5: O último elemento do Heap será a raiz da árvore
     return ValMin(Heap);
 }
+
+
+
  
 
 // Função para printar array
-void printArray (int array[], int n)
+void printArray (unsigned int array[], int n)
 {
     int i;
     for (i = 0; i < n; ++i)
@@ -178,39 +190,100 @@ void printArray (int array[], int n)
 
 
 //Printa o código de Huffman da raíz as folhas. int array[] armazenará os códigos.
-void printCodigo(struct NoArvoreH* raiz, int array[], int acima)
+void MontaTabela (struct NoArvoreH* raiz, int array[], int acima, struct TabelaHuff * Tabela)
 {
+    
     // Tudo a esquerda será igual a 0
     if (raiz->esqr)
     {
         array[acima] = 0;
-        printCodigo(raiz->esqr, array, acima + 1);
+        MontaTabela(raiz->esqr, array, acima + 1, Tabela);
     }
  
     // Tudo a direita será igual a 1
     if (raiz->dir){
     
         array[acima] = 1;
-        printCodigo(raiz->dir, array, acima + 1);
+        MontaTabela(raiz->dir, array, acima + 1, Tabela);
     }
  
     //Chegou numa folha, então printar!
     if (Folha(raiz))
     {
-        printf("%d: ", raiz->val);
-        printArray(array, acima);
+
+        for(int i =0; i < acima; i++ )
+            Tabela->codigohuffman[Tabela->tamanho][i] =  array[i];
+
+        Tabela->valor[Tabela->tamanho] = raiz->val;
+        Tabela->acima[Tabela->tamanho] =  acima;
+        Tabela-> tamanho = (Tabela->tamanho) + 1;
+       // printf("%d: ", raiz->val);
+       //printArray(array, acima);
     }
 }
  
+
+//Procura pelo código
+struct NoArvoreH * BuscaHuffman (struct NoArvoreH* raiz, unsigned char zou)
+{
+    
+    // Tudo a esquerda será igual a 0
+    if (zou == '0')
+    {
+        //printf("0");
+        return raiz->esqr;
+    } // Tudo a direita será igual a 1
+    else if (zou == '1'){ 
+         printf("1");
+        return raiz->dir;
+    }
+
+}
+
+//Cria a Tabela de Huffman 
+struct TabelaHuff * CriaTabela (int tamanho)
+{
+ 
+    struct TabelaHuff* Tabela = (struct TabelaHuff*) malloc(sizeof(struct TabelaHuff));
+    Tabela->tamanho = 0;
+    Tabela->valor = (unsigned char *) malloc ((tamanho + 1)*sizeof(unsigned char));
+    Tabela->acima = (int *) malloc ((tamanho + 1)*sizeof(int));
+    Tabela->codigohuffman = (int **) malloc((tamanho + 1)*sizeof(int *));
+    for (int i = 0; i <= tamanho; i++)
+        Tabela->codigohuffman[i] = (int *) malloc (100 * sizeof (int));
+
+    return Tabela;
+}
+
+void DestroiTabela (struct TabelaHuff* Tabela)
+{
+    for (int i = 0; i < Tabela->tamanho; i++)
+    {
+        free(Tabela->codigohuffman[i]);
+    }
+    free(Tabela->codigohuffman);
+    free(Tabela->valor);
+    free(Tabela->acima);
+    free(Tabela);
+}
+
+//Escrita 
 //Faz a codificação Huffman
-void CodigoHuffman (char val[], int freq[], int tamanho)
+struct TabelaHuff * TabelaCodigoHuffman (unsigned char val[], int freq[],  unsigned int tamanho)
 {
    //  Constroi uma Árvore Huffman
-   struct NoArvoreH* raiz = ConstroiArvoredeHuffman(val, freq, tamanho);
- 
-   // Printar os códigos
+   struct NoArvoreH * raiz = ConstroiArvoredeHuffman(val, freq, tamanho);
+   struct TabelaHuff* Tabela = CriaTabela(tamanho);
    int array[MAX_ARV], acima = 0;
-   printCodigo(raiz, array, acima);
+   MontaTabela (raiz,array, acima, Tabela);
+   return Tabela;
 
+}
+
+//Leitura
+struct NoArvoreH * ArvoreHuffman (unsigned char val[], int freq[], unsigned int tamanho)
+{
+   struct NoArvoreH * raiz = ConstroiArvoredeHuffman(val, freq, tamanho);
+   return raiz;
 }
 
