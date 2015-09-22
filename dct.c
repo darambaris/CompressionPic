@@ -110,9 +110,7 @@ void desfazTransformadaDCT(int bloco[8][8]){
 			bloco[x][y] = sum;
 			
 
-			// a quantizacao inversa pode fazer com que -128 vire -129, ou 127 vire 128, por exemplo
-			// quando formos salvar a imagem como char ao inves de int, temos alguns probleminhas...
-			// para resolver isso, precisamos desse if
+			// o arredondamento pode ultrapassar os valores estabelecidos
 			if (bloco[x][y] > 127) bloco[x][y] = 127;
 			else if (bloco[x][y] < - 128) bloco[x][y] = -128; 
 		}

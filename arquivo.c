@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "arquivo.h"
 #include "comPerdas.h"
 #include "dct.h"
@@ -58,7 +59,7 @@ int *leArquivoEmBlocos(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader
 	/* lẽ as informações contidas sobre o cabeçalho bmp */
 	fread(infoHeader, sizeof(InfoHeaderBMP), 1, arq);
 
-	//verifica se o arquivo é um bitmap VER SE É NECESSÁRIO POR DEPOIS
+	//verifica se o arquivo é um bitmap VER SE É NECESSÁRIO POR DEPOIS */
 
 	/* calcula o número de blocos 8x8 que possui na largura e na altura */
 	numBlocosLargura = infoHeader->biWidth / 8; 
@@ -68,8 +69,7 @@ int *leArquivoEmBlocos(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader
 	restoPixelsLargura = infoHeader->biWidth % 8;
 	restoPixelsAltura = infoHeader->biHeight % 8;
 
-	printf("numBlocosLargura: %d",numBlocosLargura);
-	printf("numBlocosAltura: %d",numBlocosAltura);
+	
 	/* calcula tamanho inicial do vetor de Blocos */ 
 	BlocoRGB *vetorBlocos = (BlocoRGB *) malloc(sizeof(BlocoRGB)*((numBlocosLargura+1)*(numBlocosAltura+1)));
 	*vetBlocosMain = (BlocoRGB *) malloc(sizeof(BlocoRGB)*((numBlocosLargura+1)*(numBlocosAltura+1)));
@@ -160,7 +160,16 @@ int *leArquivoEmBlocos(char path[], HeaderBMP *header, InfoHeaderBMP *infoHeader
 }
 
 int gravaArquivoEmBlocos(char path[],HeaderBMP header, InfoHeaderBMP infoHeader,BlocoRGB vetorBlocos[]){
-	FILE *arq = fopen("imagens/transformada5.bmp","wb+");
+	
+	path = strtok(path,"/");
+	path = strtok(NULL,"/");
+
+	char *nomeArquivo = malloc (sizeof(path)+30);
+	strcat(nomeArquivo, "imagens/");
+	strcat(nomeArquivo, "com-perdas-");
+	strcat(nomeArquivo,path);
+
+	FILE *arq = fopen(nomeArquivo,"wb+");
 	unsigned short numMagic = 19778;
 
 	// salva o header de arquivo (fheader) com 14 bytes
@@ -177,11 +186,6 @@ int gravaArquivoEmBlocos(char path[],HeaderBMP header, InfoHeaderBMP infoHeader,
 
 	int restoPixelsAltura = infoHeader.biHeight % 8;
 	int restoPixelsLargura = infoHeader.biWidth % 8;
-
-
-	printf("numBlocosLargura: %d",numBlocosLargura);
-	printf("numBlocosAltura: %d",numBlocosAltura);
-	
 
 	for (col=0;col<=numBlocosAltura;col++){
 
@@ -214,7 +218,7 @@ int gravaArquivoEmBlocos(char path[],HeaderBMP header, InfoHeaderBMP infoHeader,
 	fclose(arq);
 }
 
-
+//debug
 void printvetorBlocos(BlocoRGB vetorBlocos[], int numBlocos){
 	int i,j,k;
 	for (i=0;i<numBlocos;i++){
