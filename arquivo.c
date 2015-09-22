@@ -214,7 +214,7 @@ int gravaArquivoEmBlocos(char path[],HeaderBMP header, InfoHeaderBMP infoHeader,
 		}
 		qtde_blocos += (restoPixelsLargura)?numBlocosLargura+1:numBlocosLargura;
 	}
-
+	free(nomeArquivo);
 	fclose(arq);
 }
 
