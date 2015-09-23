@@ -81,9 +81,7 @@ void aplicaTransformadaDCT(int bloco[8][8]) {
 		}
 	}
 
-	// o arredondamento pode ultrapassar os valores estabelecidos
-	if (bloco[x][y] > 127) bloco[x][y] = 127;
-	else if (bloco[x][y] < -128) bloco[x][y] = -128; 
+	
 }
 
 

@@ -9,13 +9,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
 #include "arquivo.h"
 #include "comPerdas.h"
 
 #include "compressaosemperdas.c"
-//#include "CompressaoComPerdas.c"
-//#include "DescompressaoSemPerdas.c"
+
 
 #define USAGE "\
 Exemplo de Uso: ./trabalho nome-da-imagem.bmp \n\
