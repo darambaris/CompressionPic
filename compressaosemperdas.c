@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "compressaosemperdas.h"
 #include "huffman.c"
 
 //Verifica se val está em array[]
@@ -23,7 +24,7 @@ int noVetor(unsigned char *array, unsigned char val, unsigned int tamanho)
 	return -1;
 } 
 
-
+//elimina as cores que nao serão usadas para a codificação da imagem. Cria vetor de frequencias.
 int eliminaAmbcontFreq(unsigned char * val, int tamanho, unsigned char ** intpixel, int ** freq)
 { 
 
@@ -32,7 +33,7 @@ int eliminaAmbcontFreq(unsigned char * val, int tamanho, unsigned char ** intpix
 	int idx = 0;
 	int idxpesq = 0;
 
-	//Evitar problema com 0s
+	//incializa o vetor
 	for(int i=0; i<tamanho; i ++)
 			temp[i] = -1;
 
@@ -53,7 +54,8 @@ int eliminaAmbcontFreq(unsigned char * val, int tamanho, unsigned char ** intpix
 				tempfreq[idxpesq] = tempfreq[idxpesq] + 1; 
 			}
 		}
-		
+
+		//tira o erro da inicialização de unsigned char
 		tempfreq[idx] = 0;
 		for(int i=0; i < tamanho; i++)
 		{
@@ -64,16 +66,16 @@ int eliminaAmbcontFreq(unsigned char * val, int tamanho, unsigned char ** intpix
 			}
 		}
 		idx++;
-		
+
 		*freq = tempfreq;
 		*intpixel = temp;
 		return idx;
 }
 
+//Grava bit a bit a codificação huffman para os valores extraidos da imagem em um arquivo binário.
 void GravaBitaBit(unsigned char *val, unsigned int tamanho, struct TabelaHuff * Tabela)
 {
 	int idx;
-	int sumu=0,sumz=0;
 	unsigned char temp = 0b00000000;
 	int contaBit = 0;
 	FILE *f;
@@ -90,18 +92,16 @@ void GravaBitaBit(unsigned char *val, unsigned int tamanho, struct TabelaHuff * 
 			for(int j=0; j < Tabela->acima[idx]; j++)
 			{
 				
-				
+				//Armazena bit a bit em um unsigned char que funcionará como buffer.
 				if(Tabela->codigohuffman[idx][j] == 0)
 				{
 
-					sumz++;
 					temp = temp <<= 1;
 					contaBit ++;
 					
 
 				}else if(Tabela->codigohuffman[idx][j] == 1)
 				{
-					sumu++;
 					temp = temp <<=1;
 					temp = temp | 0b00000001;
 					contaBit ++;
@@ -129,7 +129,7 @@ void GravaBitaBit(unsigned char *val, unsigned int tamanho, struct TabelaHuff * 
 		
 	}
 
-	
+		//grava os ultimos bits restantes, que nao completaram 1 byte de buffer.
 		if(contaBit != 0)
 		{
 			temp = temp <<= (8 - contaBit);
@@ -141,7 +141,7 @@ void GravaBitaBit(unsigned char *val, unsigned int tamanho, struct TabelaHuff * 
 }
 
 
-
+//Le bit a bit do arquivo comprimido, traduz o codigo huffman, e salva a imagem como .bmp
 void  LeBitaBit (struct NoArvoreH* raiz, unsigned int tamanho)
 {
 	unsigned char temp;
@@ -162,7 +162,7 @@ void  LeBitaBit (struct NoArvoreH* raiz, unsigned int tamanho)
 	{
 		// printf("%d ", temp);
 	while(count != 8)
-	{
+	{	//leitura bit a bit
 		if((temp & 0b10000000) == 0b10000000)
 		{
 			//sumu++;
@@ -178,7 +178,7 @@ void  LeBitaBit (struct NoArvoreH* raiz, unsigned int tamanho)
 		}
 		
 		if(Folha(No))
-		{
+		{	//achou nó, então traduz o código huffman
 			//printf(":%d\n",No->val );
 			val[aux] = No->val;
 			No = raiz;
@@ -192,20 +192,20 @@ void  LeBitaBit (struct NoArvoreH* raiz, unsigned int tamanho)
 	}
 
 	fclose(f);
-	
+	//armazena tudo na imagem .bmp
 	f = fopen("SemPerda.bmp", "w+");
 	fwrite (val, sizeof(char), aux, f);
 	fclose(f);
 
 }
 
-
+//Rotina para a descompressão sem perdas.
 void descompressaoSemPerdas( unsigned char *intpixel, int *freq, unsigned int tamanhofreq, unsigned int tamanho){
 	struct NoArvoreH * raiz = ArvoreHuffman(intpixel,freq,tamanhofreq);
 	LeBitaBit(raiz, tamanho);
 }
 
-
+//Rotina para compressão sem perdas e a chamada da rotina de descompressão, logo após salvar o resultado da compressão.
 int compressaoSemPerdas(unsigned char *val, unsigned int tamanho){
 	int *freq = NULL;
 	unsigned char *intpixel = NULL;
@@ -214,22 +214,12 @@ int compressaoSemPerdas(unsigned char *val, unsigned int tamanho){
 	tamanhofreq = eliminaAmbcontFreq(val,tamanho,&intpixel,&freq);
 	struct TabelaHuff* Tabela = TabelaCodigoHuffman(intpixel,freq,tamanhofreq);
 	struct NoArvoreH* Arvore = ArvoreHuffman(intpixel,freq,tamanhofreq);
-/*
-	int sum = 0;
-	int idx = 0;
-		for(int i =0; i < tamanho; i++)
-		{
-			idx = noVetor(Tabela->valor, val[i], Tabela->tamanho);
-			sum = sum + Tabela->acima[idx];
-		}
-
-		printf("%d\n", sum );	
-*/	
 
 	GravaBitaBit(val, tamanho, Tabela);
 
 	DestroiTabela(Tabela);
-
+	
+	//chamada da rotina de descompressão.
 	descompressaoSemPerdas(intpixel, freq, tamanhofreq, tamanho);
 
 	return EXIT_SUCCESS;

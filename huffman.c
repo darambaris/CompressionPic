@@ -2,41 +2,14 @@
  ===========================================================================================================
  Nome         : huffman.c
  Autores      : Jéssika Darambaris e Roberto Freitas
- Descrição    : Arquivo responsável por implementar a árvore de Huffman. 
+ Descrição    : Arquivo responsável por implementar a Árvore de Huffman. 
  ===========================================================================================================
  */
 
-
 #include <stdio.h>
 #include <stdlib.h>
-
- //Altura máxima da árvore
-#define MAX_ARV 100
+#include "huffman.h"
  
-//Nó da Árvore de Huffman
-struct NoArvoreH
-{
-    unsigned char val;  // Valor do pixel inserido na árvore
-    unsigned freq;  // Frequencia do pixel inserido
-    struct NoArvoreH *esqr, *dir; // Nós da esquerda e da direita da árvore
-};
- 
-//Coleção de Árvores de Huffman. Funcionará como fila de prioridade.
-struct Heap
-{
-    unsigned tamanho;    // Tamanho
-    unsigned capacidade;   // Capacidade da Árvore
-    struct NoArvoreH **array;  // Array de Nós de ArvoreH.
-};
-
-//Tabela de Huffman
-struct TabelaHuff
-{
-    unsigned char *valor;
-    int *acima;
-    int **codigohuffman;
-    unsigned int tamanho;
-};
 
 // Cria um Heap
 struct Heap* CriarHeap(unsigned capacidade)
@@ -68,7 +41,7 @@ void TrocarNos(struct NoArvoreH** a, struct NoArvoreH** b)
     *b = t;
 }
  
-//Arruma a árvore
+//Junta as sub-árvores no Heap 
 void HeapMin(struct Heap* Heap, int idx)
 {
     int menor = idx;
@@ -133,7 +106,7 @@ int Folha (struct NoArvoreH* raiz)
     return !(raiz->esqr) && !(raiz->dir) ;
 }
 
-//Cria um Heap para armazena os valores
+//Cria um Heap e adiciona os valores a ele
 struct Heap* CriareConstruirHeap (char val[], int freq[], int tamanho)
 {
     struct Heap* Heap = CriarHeap(tamanho);
@@ -174,22 +147,7 @@ struct NoArvoreH* ConstroiArvoredeHuffman (char val[], int freq[], int tamanho)
     return ValMin(Heap);
 }
 
-
-
- 
-
-// Função para printar array
-void printArray (unsigned int array[], int n)
-{
-    int i;
-    for (i = 0; i < n; ++i)
-        printf("%d", array[i]);
-    printf("\n");
-}
-
-
-
-//Printa o código de Huffman da raíz as folhas. int array[] armazenará os códigos.
+//Monta a Tabela de Huffman 
 void MontaTabela (struct NoArvoreH* raiz, int array[], int acima, struct TabelaHuff * Tabela)
 {
     
@@ -207,7 +165,7 @@ void MontaTabela (struct NoArvoreH* raiz, int array[], int acima, struct TabelaH
         MontaTabela(raiz->dir, array, acima + 1, Tabela);
     }
  
-    //Chegou numa folha, então printar!
+    //Chegou numa folha, então, armazena valor!
     if (Folha(raiz))
     {
 
@@ -217,13 +175,11 @@ void MontaTabela (struct NoArvoreH* raiz, int array[], int acima, struct TabelaH
         Tabela->valor[Tabela->tamanho] = raiz->val;
         Tabela->acima[Tabela->tamanho] =  acima;
         Tabela-> tamanho = (Tabela->tamanho) + 1;
-       // printf("%d: ", raiz->val);
-       //printArray(array, acima);
     }
 }
  
 
-//Procura pelo código
+//Procura pela árvore de Huffman o codigo do arquivo comprimido
 struct NoArvoreH * BuscaHuffman (struct NoArvoreH* raiz, unsigned char zou)
 {
     
@@ -255,6 +211,7 @@ struct TabelaHuff * CriaTabela (int tamanho)
     return Tabela;
 }
 
+//Destroi a Tabela de Huffman
 void DestroiTabela (struct TabelaHuff* Tabela)
 {
     for (int i = 0; i < Tabela->tamanho; i++)
@@ -267,8 +224,9 @@ void DestroiTabela (struct TabelaHuff* Tabela)
     free(Tabela);
 }
 
-//Escrita 
-//Faz a codificação Huffman
+
+//Escrita
+//Cria uma Tabela de Huffman e a retorna.
 struct TabelaHuff * TabelaCodigoHuffman (unsigned char val[], int freq[],  unsigned int tamanho)
 {
    //  Constroi uma Árvore Huffman
@@ -280,7 +238,9 @@ struct TabelaHuff * TabelaCodigoHuffman (unsigned char val[], int freq[],  unsig
 
 }
 
+
 //Leitura
+//Cria uma Árvore de Huffman, e a retorna.
 struct NoArvoreH * ArvoreHuffman (unsigned char val[], int freq[], unsigned int tamanho)
 {
    struct NoArvoreH * raiz = ConstroiArvoredeHuffman(val, freq, tamanho);

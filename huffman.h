@@ -1,98 +1,144 @@
+/*
+ ===========================================================================================================
+ Nome         : huffman.h
+ Autores      : Jéssika Darambaris e Roberto Freitas
+ Descrição    : Biblioteca de "huffman.c".
+ ===========================================================================================================
+ */
+
 #ifndef HUFFMAN_H
 #define HUFFMAN_H
 
-// This constant can be avoided by explicitly calculating height of Huffman Tree
-#define MAX_TREE_HT 100
-
+#include <stdio.h>
 #include <stdlib.h>
 
+ //Altura máxima da árvore
+#define MAX_ARV 100
 
- 
-//Estrutura de dados dos nós da Árvore Binária (Huffman).
-struct NoHeap
+/*
+    Estrutura de dados para armazenar os nós da Árvore de Huffman.
+*/
+struct NoArvoreH
 {
-    char val;  // Valor do pixel inserido na árvore
+    unsigned char val;  // Valor do pixel inserido na árvore
     unsigned freq;  // Frequencia do pixel inserido
     struct NoArvoreH *esqr, *dir; // Nós da esquerda e da direita da árvore
 };
  
-//Estrutura de dados da Árvore Binária (Huffman).
+/*
+    Essa é a estrutura de dados para o Heap.
+    O Heap funcionará como uma fila de prioridades.
+*/
 struct Heap
 {
     unsigned tamanho;    // Tamanho
     unsigned capacidade;   // Capacidade da Árvore
     struct NoArvoreH **array;  // Array de Nós de ArvoreH.
 };
+
+/*
+    Estrutura de dados para a Tabela de Huffman. Não é necessária, no entanto,
+    foi bastante útil na implementação dos algorítimos de compressão.
+*/
+struct TabelaHuff
+{
+    unsigned char *valor;       //Valores da tabela de huffman
+    int *acima;                //Tamanho 
+    int **codigohuffman;       //Codigo do valor, adicionado em vetor
+    unsigned int tamanho;      //tamanho da Tabela (numero de valores)
+};
  
-
 /*
-    Função que cria um novo nó na Heap.
-    - char val: valor da intensidade do pixel
-    - freq: frequencia do valor
-*/
-struct NoHeap* NovoNo (char val, unsigned freq)
-
-/*
-    Função que cria um Heap.
-    - unsigned capacidade: capacidade da árvore. 
-*/
+    Essa função é responsável por instaciar um Heap, que será utilizado na construção da Árvore de Huffman.
+    Ela é criada com a "capacidade" enviada por parâmetro, e retorna um ponteiro para o Heap criado.
+*/ 
 struct Heap* CriarHeap(unsigned capacidade);
 
 /*
-    Função para trocar dois nós.
-    - NoArvoreH *a: Nó da árvore a. 
-    - NoArvoreH *b: Nó da árvore b. 
+    Essa função é responsável por criar os nós da Árvore de Huffman. 
+    Para cada nó é associado um valor e uma frequência, passados por parâmetro, que posteriormente será necessário para a construção
+    da árvore de Huffman. A função retorn um vetor para um nó criado.
+*/
+struct NoArvoreH* NovoNo (unsigned char val, unsigned freq);
+ 
+/*
+    Essa função é responsável por inverter os nós passados por parâmetro ('a'e 'b').
 */
 void TrocarNos(struct NoArvoreH** a, struct NoArvoreH** b);
+ 
+/*
+    Essa fuñção arruma o Heap com a sub-árvores. Essa função é essencial para quando a árvore de huffman está sendo
+    criada.
+*/
+void HeapMin(struct Heap* Heap, int idx);
+ 
+/*
+    Essa função verifica se o Heap possuí apenas um elemento. Em caso positivo, retorna 1, e retorna 0 em caso negativo.
+*/
+int TamanhoUm(struct Heap* Heap);
+ 
+/*
+    Essa função simplesmente extrai o nó de menor valor do Heap, e o retorna.
+*/
+struct NoArvoreH* ValMin (struct Heap* Heap);
 
 /*
-    Função 
-    - struct ArvoreH* ArvoreH: Árvore de Huffman.
-    - int idx: index
+    Essa função insere os nós no Heap. 
+    Função de inicialização do Heap.
 */
-void ArvoreMin(struct ArvoreH* ArvoreH, int idx);
+void Insere(struct Heap* Heap, struct NoArvoreH* NoArvoreH);
+ 
+/*
+    Essa função é utilizada durante a construção do Heap, para, iterativamente, arrumá-lo.
+*/
+void ConstroiHeap(struct Heap* Heap);
 
 /*
-    Função que verifica se a árvore possui tamanho um.
-    - struct ArvoreH* ArvoreH: ArvoreH possui tamanho um?
+    Essa função verifica se um nó, passado por parâmetro, é uma folha. Caso positivo, a função retorna 1, caso negativo, retorna 0.
 */
-int TamanhoUm(struct ArvoreH* ArvoreH);
+int Folha (struct NoArvoreH* raiz);
 
 /*
-    Função que retira o nó de menor valor da Árvore.
-    - struct ArvoreH* ArvoreH: Árvore.
+    Função de inicialização do Heap. Onde este é criado e incializado com os nós da Árvore de Huffman.
 */
-struct NoArvoreH* ValMin (struct ArvoreH* ArvoreH);
-
-/* 
-    Função que insere um nó na Árvore.
-    - struct ArvoreH* ArvoreH:
-    - struct NoArvoreH* NoArvoreH:
-*/
-void Insere(struct ArvoreH* ArvoreH, struct NoArvoreH* NoArvoreH);
+struct Heap* CriareConstruirHeap (char val[], int freq[], int tamanho);
 
 /*
-    Função Constroi uma Arvore Binária Huffman
-    - struct ArvoreH* ArvoreH: Arvore Binária. 
-
+    Principal função da Biblioteca. Ela é responsável por criar a árvore de Huffman. A função retorna o nó da raiz da árvore.
 */
-void ConstroiArvore(struct ArvoreH* ArvoreH);
+struct NoArvoreH* ConstroiArvoredeHuffman (char val[], int freq[], int tamanho);
 
 /*
-    Função que gera o Codigo Huffman.
-    - char val[]: 
-    - int freq[]:
-    - int tamanho:
+    Essa função monta uma Tabela de Huffman, com os dados das folhas e caminhos da Árvore de Huffman posteriormente criada.
 */
-void CodigoHuffman (char val[], int freq[], int tamanho);
+void MontaTabela (struct NoArvoreH* raiz, int array[], int acima, struct TabelaHuff * Tabela);
+
+/*
+    Essa função é recursiva, para identificar um código na Árvore de Huffman, passada por parâmetro.
+*/
+struct NoArvoreH * BuscaHuffman (struct NoArvoreH* raiz, unsigned char zou);
+
+/*
+    Essa função cria uma Tabela de Huffman.
+*/
+struct TabelaHuff * CriaTabela (int tamanho);
+
+/*
+    Essa função é simplesmente responsável por desalocar a Tabela de Huffman.
+*/
+void DestroiTabela (struct TabelaHuff* Tabela);
+
+/*
+    Essa função cria uma Tabela de Huffman, e a retorna. Essa função é mais organizacional mais do que funcional. Retorna o vetor da 
+    Tabela criada.
+*/
+struct TabelaHuff * TabelaCodigoHuffman (unsigned char val[], int freq[],  unsigned int tamanho);
 
 
 /*
-    Função que printa Array
-    - int array[]: array a ser printado
-    - int n: tamanho do array
+    Analogamente à função "TabelaCodigoHuffman", essa função é responsável por criar uma Árvore de Huffman e retornar seu ponteiro.
 */
-void printArray (int array[], int n);
+struct NoArvoreH * ArvoreHuffman (unsigned char val[], int freq[], unsigned int tamanho);
 
 
 #endif // HUFFMAN_H
